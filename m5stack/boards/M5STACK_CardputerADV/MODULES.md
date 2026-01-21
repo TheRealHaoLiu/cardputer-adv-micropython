@@ -1,7 +1,8 @@
-# CardputerADV Custom Firmware - Module Reference
+# CardputerADV Stock Firmware - Module Reference
 
-Cloud-free UIFlow2 MicroPython for M5Stack Cardputer-ADV.
-Build: `idf.py -D MICROPY_BOARD=M5STACK_CardputerADV_Custom build`
+UIFlow2 MicroPython for M5Stack Cardputer-ADV (stock firmware with cloud connectivity).
+
+Build: `idf.py -D MICROPY_BOARD=M5STACK_CardputerADV build`
 
 ## M5 Module (Core Hardware API)
 
@@ -107,33 +108,32 @@ import webrepl          # Remote REPL over WebSocket
 import upysh            # Shell commands (ls, cat, pwd, etc.)
 ```
 
-## Async Networking
+## UIFlow2 Startup (Stock Only)
+
+These modules are only available in the stock firmware and provide the UIFlow2 launcher experience.
 
 ```python
-import aiorepl                    # Async REPL over network
-import uaiohttpclient             # Async HTTP client
+from startup.cardputeradv import framework   # UIFlow2 app framework
+from startup.cardputeradv import app_base    # Base class for apps
+from startup.cardputeradv.apps import launcher   # App launcher
+from startup.cardputeradv.apps import settings   # Settings app
+from startup.cardputeradv.apps import app_list   # App list management
+from startup.cardputeradv.apps import app_run    # App runner
+from startup.cardputeradv.apps import ezdata     # EzData cloud app
+from startup.cardputeradv.apps import statusbar  # Status bar widget
+from startup.cardputeradv.apps import dev        # Developer tools
 ```
 
-## HTTP/Web
+## Cloud Data Sync (Stock Only)
 
 ```python
-import requests2                  # HTTP client (requests-like)
-from microdot import Microdot     # Lightweight async web framework
-import uftpd                      # FTP server
+import ezdata           # M5Stack cloud data sync service
 ```
 
-## TCP Sockets
+## LVGL Utilities (Stock Only)
 
 ```python
-from easysocket.tcp_client import TCPClient
-from easysocket.tcp_server import TCPServer
-```
-
-## MQTT
-
-```python
-from umqtt.simple import MQTTClient   # Simple MQTT
-from umqtt.robust import MQTTClient   # Auto-reconnect MQTT
+import lv_utils         # LVGL helper utilities
 ```
 
 ## BLE
@@ -160,14 +160,6 @@ from cap import GPSCap            # GPS cap via UART
 
 # Hardware LoRa driver
 from hardware import LoRa
-```
-
-## USB HID
-
-```python
-from usb.device.keyboard import Keyboard
-from usb.device.mouse import Mouse
-from usb.device import hid
 ```
 
 ## Cardputer Hardware
@@ -217,6 +209,19 @@ from chain import JoystickChain
 from chain import KeyChain
 from chain import ToFChain
 from chain import BusChainUnit
+```
+
+## HTTP/Web
+
+```python
+import requests2                  # HTTP client (requests-like)
+```
+
+## MQTT
+
+```python
+from umqtt.simple import MQTTClient   # Simple MQTT
+from umqtt.robust import MQTTClient   # Auto-reconnect MQTT
 ```
 
 ## Sensors (driver.*)
@@ -464,14 +469,6 @@ from unit import RFIDUnit         # RFID unit
 - `MQTTUnit`, `MQTTPoEUnit`
 - `DMX512Unit`
 
-## Firmware Version
-
-```python
-import firmware_info
-print(firmware_info.CUSTOM_VERSION)    # "2.4.1+adv.1"
-print(firmware_info.UPSTREAM_VERSION)  # "2.4.1"
-```
-
 ## Utilities
 
 ```python
@@ -484,25 +481,6 @@ import warnings
 import image_plus
 from utility import exception_helper
 ```
-
-## NOT Included
-
-- `startup/*` - UIFlow2 cloud pairing
-- `ezdata` - Cloud data sync
-- `lv_utils` - LVGL (too large)
-
-## Comparison: Stock vs Custom Firmware
-
-| Feature | Stock | Custom |
-|---------|-------|--------|
-| UIFlow2 Launcher | Yes | No |
-| Cloud Pairing | Yes | No |
-| EzData Cloud Sync | Yes | No |
-| LVGL Utilities | Yes | No |
-| Microdot Web Server | No | Yes |
-| uftpd FTP Server | No | Yes |
-| USB HID | No | Yes |
-| aiorepl | No | Yes |
 
 ## Examples
 
@@ -532,24 +510,6 @@ from hardware import MatrixKeyboard
 kb = MatrixKeyboard()
 key = kb.get_key()
 
-# USB Keyboard
-from usb.device.keyboard import Keyboard
-kbd = Keyboard()
-kbd.send_string("Hello!")
-
-# Web Server
-from microdot import Microdot
-app = Microdot()
-@app.route('/')
-def index(req): return 'Hello!'
-app.run(port=80)
-
-# MQTT
-from umqtt.simple import MQTTClient
-c = MQTTClient("id", "broker.hivemq.com")
-c.connect()
-c.publish("topic", "msg")
-
 # LoRa (using Cap module)
 from cap import LoRa1262Cap
 lora = LoRa1262Cap()
@@ -564,4 +524,15 @@ lat, lon = gps.get_position()
 from unit import CardKBUnit
 kb = CardKBUnit()
 key = kb.get_key()
+
+# MQTT
+from umqtt.simple import MQTTClient
+c = MQTTClient("id", "broker.hivemq.com")
+c.connect()
+c.publish("topic", "msg")
+
+# EzData (stock only)
+import ezdata
+ezdata.set_key("your_token")
+ezdata.put("key", "value")
 ```
