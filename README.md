@@ -28,6 +28,60 @@ The default board build the M5STACK_AtomS3 one, You can use the `make BOARD=<boa
 
 More command support, you can check the [Makefile](./m5stack/Makefile).
 
+## CardputerADV Custom Board
+
+The `M5STACK_CardputerADV_Custom` board is a cloud-free variant that excludes UIFlow2 cloud connectivity and startup UI components. This is ideal for standalone MicroPython applications that don't need cloud features.
+
+### What's Excluded
+
+- `modules/startup/` - CloudApp, pairing UI, account management
+- `libs/ezdata/` - Cloud data sync library
+- `libs/lv_utils/` - LVGL utilities (deferred to future work)
+
+### What's Included
+
+- All M5Stack hardware APIs (`M5.begin()`, `M5.Lcd`, `M5.Speaker`, etc.)
+- `hardware.MatrixKeyboard` for I2C keyboard input
+- `M5.Widgets` for fonts and UI widgets
+- Core MicroPython modules (`asyncio`, `network`, `ssl`, etc.)
+- Standard M5Stack libraries (BLE, ESP-NOW, MQTT, etc.)
+
+### Building the Minimal Firmware
+
+```shell
+make BOARD=M5STACK_CardputerADV_Custom build
+make BOARD=M5STACK_CardputerADV_Custom flash
+```
+
+### Boot Behavior
+
+Without the startup modules, the firmware boots directly to the MicroPython REPL or executes `/flash/main.py` if present. There's no cloud pairing screen or connection attempts.
+
+### Upstream Merge Strategy
+
+This board configuration is designed for clean upstream merges:
+
+```shell
+git remote add upstream https://github.com/m5stack/uiflow-micropython.git
+git fetch upstream
+git merge upstream/main
+# Should be conflict-free since we only ADD files, never modify upstream
+```
+
+Files we add (no upstream conflicts):
+- `boards/M5STACK_CardputerADV_Custom/` - New cloud-free board config
+- `openspec/` - Project specifications
+- `CLAUDE.md` - AI assistant instructions
+
+Files we don't touch (clean merges):
+- `boards/M5STACK_CardputerADV/` - Original stays as-is
+- `modules/startup/` - Stays in repo, just not in our manifest
+- `libs/ezdata/` - Stays in repo, just not in our manifest
+
+### Adding Modules Back
+
+If you need a module that was excluded, edit `boards/M5STACK_CardputerADV_Custom/manifest.py` and uncomment or add the relevant `include()` line.
+
 ## Documentation
 
 API documentation for this library can be found on [Read the Docs](https://uiflow-micropython.readthedocs.io/en/latest/).

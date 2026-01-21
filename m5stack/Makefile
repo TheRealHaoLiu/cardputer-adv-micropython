@@ -46,6 +46,7 @@ boards := \
 	M5STACK_StamPLC:stamplc          \
 	M5STACK_Tab5:tab5                \
 	M5STACK_CardputerADV:cardputeradv\
+	M5STACK_CardputerADV_Custom:cardputeradv-custom\
 	M5STACK_Unit_C6L:unit_c6l        \
 	M5STACK_PowerHub:powerhub        \
 	M5STACK_DualKey:dualkey          \
@@ -92,6 +93,7 @@ BOARD_TYPE_DEF := \
 	stamplc     \
 	tab5        \
 	cardputeradv\
+	cardputeradv-custom\
 	unit_c6l    \
 	powerhub    \
 	dualkey     \
