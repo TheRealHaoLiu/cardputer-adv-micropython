@@ -468,7 +468,7 @@ from unit import RFIDUnit         # RFID unit
 
 ```python
 import firmware_info
-print(firmware_info.CUSTOM_VERSION)    # "2.4.1+adv.1"
+print(firmware_info.CUSTOM_VERSION)    # "2.4.1+therealhaoliu.1"
 print(firmware_info.UPSTREAM_VERSION)  # "2.4.1"
 ```
 
