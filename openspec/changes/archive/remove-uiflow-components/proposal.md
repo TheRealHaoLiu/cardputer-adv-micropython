@@ -21,7 +21,7 @@ By **excluding** these components (not deleting them), we get:
 We ADD new board configs that exclude unwanted modules via manifests. We don't modify or delete existing upstream files.
 
 ### Phase 1: Create Cloud-Free Board Config
-- Create `boards/M5STACK_CardputerADV_Minimal/` (copy of CardputerADV)
+- Create `boards/M5STACK_CardputerADV_Custom/` (copy of CardputerADV)
 - Create `manifest.py` that **excludes** startup modules and cloud libs
 - Don't touch original `boards/M5STACK_CardputerADV/`
 
@@ -32,7 +32,7 @@ We ADD new board configs that exclude unwanted modules via manifests. We don't m
 - Include only needed `libs/` modules
 
 ### Phase 3: Test and Validate
-- Build with `make BOARD=M5STACK_CardputerADV_Minimal`
+- Build with `make BOARD=M5STACK_CardputerADV_Custom`
 - Verify all essential APIs work
 - Test cardputer app compatibility
 
@@ -44,7 +44,8 @@ We ADD new board configs that exclude unwanted modules via manifests. We don't m
 ## Impact
 
 - **Files we ADD (no upstream conflicts):**
-  - `boards/M5STACK_CardputerADV_Minimal/` - Cloud-free board config
+  - `boards/M5STACK_CardputerADV_Custom/` - Cloud-free board config
+  - `libs/uftpd/` - FTP server library
   - `openspec/` - Specifications
   - `CLAUDE.md` - Project instructions
 
@@ -53,13 +54,25 @@ We ADD new board configs that exclude unwanted modules via manifests. We don't m
   - `modules/startup/` - Stays in repo, just not in our manifest
   - `libs/ezdata/` - Stays in repo, just not in our manifest
 
-- **Preserved APIs (must still work):**
+- **Preserved APIs (all work):**
   - `M5.begin()`, `M5.update()`, `M5.getBoard()` (returns 24)
   - `M5.Lcd` (all drawing primitives)
   - `M5.Speaker` (tone, volume)
   - `M5.Widgets.FONTS.ASCII7`
   - `hardware.MatrixKeyboard` (I2C keyboard)
   - `network`, `esp32.NVS`, `asyncio`
+
+- **Additional libraries included:**
+  - `microdot` - Lightweight web framework
+  - `uftpd` - FTP server
+  - `usb` - USB HID (keyboard/mouse emulation)
+  - `aiorepl` - Async REPL over network
+  - `uaiohttpclient` - Async HTTP client
+
+- **Firmware size comparison:**
+  - Original UIFlow2: 8.0 MB
+  - Custom (cloud-free): 6.1 MB
+  - **Savings: 23% smaller**
 
 - **Upstream merge strategy:**
   ```bash

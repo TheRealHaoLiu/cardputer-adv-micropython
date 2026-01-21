@@ -46,12 +46,12 @@ For the Cardputer ADV running standalone MicroPython apps, we only need:
 │  - Same files as upstream (can merge cleanly)               │
 │  - PLUS: New minimal board configs we create                │
 │  - PLUS: openspec/, CLAUDE.md                               │
-│  - Build with: make BOARD=M5STACK_CardputerADV_Minimal      │
+│  - Build with: make BOARD=M5STACK_CardputerADV_Custom      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 **What we ADD (no conflicts):**
-- `boards/M5STACK_CardputerADV_Minimal/` - New board config
+- `boards/M5STACK_CardputerADV_Custom/` - New board config
 - `openspec/` - Our specs
 - `CLAUDE.md` - Our instructions
 
@@ -121,7 +121,7 @@ boards/manifest_m5stack.py
 
 ### Decision 1: Create New Board Config (Don't Modify Existing)
 
-**Choice:** Create `M5STACK_CardputerADV_Minimal` instead of modifying `M5STACK_Cardputer` or `M5STACK_CardputerADV`
+**Choice:** Create `M5STACK_CardputerADV_Custom` instead of modifying `M5STACK_Cardputer` or `M5STACK_CardputerADV`
 
 **Rationale:**
 - Preserves original for reference/comparison
@@ -130,7 +130,7 @@ boards/manifest_m5stack.py
 
 **Implementation:**
 ```bash
-cp -r boards/M5STACK_CardputerADV boards/M5STACK_CardputerADV_Minimal
+cp -r boards/M5STACK_CardputerADV boards/M5STACK_CardputerADV_Custom
 # Modify mpconfigboard.cmake and manifest.py
 ```
 
@@ -210,3 +210,48 @@ exec(open('/flash/main.py').read())
 2. **libs/base/ drivers?** Audit during implementation
 3. **USB CDC for mpremote?** Yes, enable for development
 4. **ESP-IDF components?** Use defaults, trim if needed later
+
+## Implementation Results
+
+### Final Firmware Comparison
+
+| Metric | Original UIFlow2 | Custom |
+|--------|------------------|--------|
+| Size | 8.0 MB | 6.1 MB |
+| Savings | - | 23% smaller |
+| Cloud modules | Included | Excluded |
+| Boot behavior | Cloud pairing screen | Direct to REPL/main.py |
+
+### Libraries Included in Custom Build
+
+**Excluded (cloud/unused):**
+- `modules/startup/` - Cloud pairing, CloudApp
+- `libs/ezdata/` - Cloud data sync
+- `libs/lv_utils/` - LVGL (deferred)
+
+**Added (useful extras):**
+- `microdot` - Lightweight web framework
+- `uftpd` - FTP server for file transfers
+- `usb` - USB HID (keyboard/mouse emulation)
+- `aiorepl` - Async REPL over network for debugging
+- `uaiohttpclient` - Async HTTP client
+
+### Build Notes (macOS)
+
+1. **mpy-cross fix**: Build with `CFLAGS_EXTRA="-Wno-error=gnu-folding-constant"` to avoid clang warnings
+2. **Dependencies**: Install `quilt`, `cmake` via Homebrew
+3. **ESP-IDF**: Use v5.4.2
+
+### Build Command
+
+```bash
+# After ESP-IDF setup
+cd m5stack
+make submodules
+make patch
+make littlefs
+make mpy-cross CFLAGS_EXTRA="-Wno-error=gnu-folding-constant"
+make BOARD=M5STACK_CardputerADV_Custom pack
+```
+
+Output: `build-M5STACK_CardputerADV_Custom/uiflow-*-cardputeradv-custom-*.bin`
