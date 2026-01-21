@@ -268,6 +268,19 @@ endif
 pack: fs
 	$(call pack_fw,$(PYTHON),none)
 
+# Release target for CardputerADV Custom - creates release artifacts
+release: pack
+ifeq ($(BOARD),M5STACK_CardputerADV_Custom)
+	$(eval CUSTOM_VERSION := $(shell grep CUSTOM_VERSION boards/M5STACK_CardputerADV_Custom/firmware_info.py | cut -d'"' -f2))
+	cp $(BUILD)/uiflow-$(GIT_VERSION).bin $(BUILD)/cardputer-adv-$(CUSTOM_VERSION).bin
+	cp $(BUILD)/uiflow-Sx-$(GIT_VERSION).uf2 $(BUILD)/cardputer-adv-$(CUSTOM_VERSION).uf2
+	cp boards/M5STACK_CardputerADV_Custom/MODULES.md $(BUILD)/cardputer-adv-$(CUSTOM_VERSION)-MODULES.md
+	@echo "\033[1;32mRelease Artifacts:\033[0m"
+	@echo "  $(BUILD)/cardputer-adv-$(CUSTOM_VERSION).bin"
+	@echo "  $(BUILD)/cardputer-adv-$(CUSTOM_VERSION).uf2"
+	@echo "  $(BUILD)/cardputer-adv-$(CUSTOM_VERSION)-MODULES.md"
+endif
+
 # Pack the firmware into a single binary with user filesystem.
 pack_all: fs
 	$(call pack_fw,$(PYTHON),$(BUILD)/fs-user.bin)
