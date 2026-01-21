@@ -52,4 +52,6 @@ tools/littlefs/prebuilt/
 
 dependencies.lock
 m5stack/.workenv
+m5stack/release/
+m5stack/boards/M5STACK_CardputerADV_Custom/firmware_info.py
 managed_components/

@@ -198,8 +198,16 @@ menu:
 size: 
 	idf.py $(IDFPY_FLAGS) size
 
+# Generate firmware_info.py from git tag (CardputerADV_Custom only)
+.PHONY: firmware-info
+FIRMWARE_INFO_FILE = boards/M5STACK_CardputerADV_Custom/firmware_info.py
+firmware-info:
+ifeq ($(BOARD),M5STACK_CardputerADV_Custom)
+	@./scripts/gen-firmware-info.sh $(MINI_FLAG) > $(FIRMWARE_INFO_FILE)
+endif
+
 # Build the MicroPython firmware
-build: nvs
+build: nvs firmware-info
 	idf.py $(IDFPY_FLAGS) build
 
 # Deploy the MicroPython firmware
@@ -268,22 +276,50 @@ endif
 pack: fs
 	$(call pack_fw,$(PYTHON),none)
 
-# Release target for CardputerADV Custom - creates release artifacts
-release: pack
+# Release target for CardputerADV Custom - builds both normal and mini variants
+RELEASE_DIR = release
+release:
 ifeq ($(BOARD),M5STACK_CardputerADV_Custom)
-	$(eval CUSTOM_VERSION := $(shell grep CUSTOM_VERSION boards/M5STACK_CardputerADV_Custom/firmware_info.py | cut -d'"' -f2))
-	cp $(BUILD)/uiflow-$(GIT_VERSION).bin $(BUILD)/cardputer-adv-$(CUSTOM_VERSION).bin
-	cp $(BUILD)/uiflow-Sx-$(GIT_VERSION).uf2 $(BUILD)/cardputer-adv-$(CUSTOM_VERSION).uf2
-	cp boards/M5STACK_CardputerADV_Custom/MODULES.md $(BUILD)/cardputer-adv-$(CUSTOM_VERSION)-MODULES.md
-	@echo "\033[1;32mRelease Artifacts:\033[0m"
-	@echo "  $(BUILD)/cardputer-adv-$(CUSTOM_VERSION).bin"
-	@echo "  $(BUILD)/cardputer-adv-$(CUSTOM_VERSION).uf2"
-	@echo "  $(BUILD)/cardputer-adv-$(CUSTOM_VERSION)-MODULES.md"
+	@mkdir -p $(RELEASE_DIR)
+	@echo "\033[1;34m=== Building normal variant ===\033[0m"
+	@rm -rf $(BUILD)
+	$(MAKE) BOARD=$(BOARD) pack
+	@VERSION=$$(grep CUSTOM_VERSION boards/M5STACK_CardputerADV_Custom/firmware_info.py | cut -d'"' -f2) && \
+		cp $(BUILD)/uiflow-$(GIT_VERSION).bin $(RELEASE_DIR)/cardputer-adv-$$VERSION.bin && \
+		cp $(BUILD)/uiflow-Sx-$(GIT_VERSION).uf2 $(RELEASE_DIR)/cardputer-adv-$$VERSION.uf2 && \
+		cp boards/M5STACK_CardputerADV_Custom/MODULES.md $(RELEASE_DIR)/cardputer-adv-$$VERSION-MODULES.md && \
+		echo "Normal: $$VERSION"
+	@echo ""
+	@echo "\033[1;34m=== Building mini variant ===\033[0m"
+	@./scripts/apply-mini-patches.sh apply
+	@rm -rf $(BUILD)
+	$(MAKE) BOARD=$(BOARD) MINI_FLAG=--mini pack
+	@VERSION=$$(grep CUSTOM_VERSION boards/M5STACK_CardputerADV_Custom/firmware_info.py | cut -d'"' -f2) && \
+		cp $(BUILD)/uiflow-$(GIT_VERSION).bin $(RELEASE_DIR)/cardputer-adv-$$VERSION.bin && \
+		cp $(BUILD)/uiflow-Sx-$(GIT_VERSION).uf2 $(RELEASE_DIR)/cardputer-adv-$$VERSION.uf2 && \
+		echo "Mini: $$VERSION"
+	@./scripts/apply-mini-patches.sh revert
+	@echo ""
+	@echo "\033[1;32mRelease Artifacts (in $(RELEASE_DIR)/):\033[0m"
+	@ls -1 $(RELEASE_DIR)/
 endif
 
 # Pack the firmware into a single binary with user filesystem.
 pack_all: fs
 	$(call pack_fw,$(PYTHON),$(BUILD)/fs-user.bin)
+
+# Build mini variant only (CJK fonts stubbed out, saves ~1.7MB)
+# Usage: make BOARD=M5STACK_CardputerADV_Custom mini
+.PHONY: mini mini-clean
+mini:
+	@./scripts/apply-mini-patches.sh apply
+	@rm -rf $(BUILD)
+	$(MAKE) BOARD=$(BOARD) MINI_FLAG=--mini pack
+	@./scripts/apply-mini-patches.sh revert
+
+mini-clean:
+	@./scripts/apply-mini-patches.sh revert
+	@rm -rf $(BUILD)
 
 # Build littlefs tool
 littlefs:
