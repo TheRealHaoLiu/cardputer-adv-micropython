@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+# SPDX-FileContributor: Hao Liu (TheRealHaoLiu)
 #
 # SPDX-License-Identifier: MIT
 #
@@ -17,6 +18,11 @@
 #   - M5Stack hardware drivers (M5.Lcd, M5.Speaker, etc.)
 #   - libs/hardware/ (MatrixKeyboard for I2C keyboard)
 #   - widgets/ (M5.Widgets.FONTS)
+
+# ============================================================================
+# Firmware version info
+# ============================================================================
+module("firmware_info.py", base_path="$(MPY_DIR)/../m5stack/boards/M5STACK_CardputerADV_Custom")
 
 # ============================================================================
 # Core MicroPython modules from boards/manifest.py

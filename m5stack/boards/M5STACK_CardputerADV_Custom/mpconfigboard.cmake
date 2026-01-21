@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+# SPDX-FileContributor: Hao Liu (TheRealHaoLiu)
 #
 # SPDX-License-Identifier: MIT
 #

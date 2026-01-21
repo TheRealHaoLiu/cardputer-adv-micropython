@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+# SPDX-FileContributor: Hao Liu (TheRealHaoLiu)
 #
 # SPDX-License-Identifier: MIT
 #
@@ -15,7 +16,7 @@ CONFIG_SPIRAM_MEMTEST=
 # CONFIG_FREERTOS_UNICORE=y
 
 # M5STACK Cardputer-ADV Custom (no cloud)
-CONFIG_TINYUSB_DESC_CDC_STRING="M5Stack Cardputer-ADV-Custom"
+CONFIG_TINYUSB_DESC_CDC_STRING="M5Stack Cardputer-ADV-Custom(TheRealHaoLiu)"
 
 # SSL
 CONFIG_MBEDTLS_AES_USE_INTERRUPT=n

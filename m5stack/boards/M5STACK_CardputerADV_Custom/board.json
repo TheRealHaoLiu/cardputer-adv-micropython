@@ -11,7 +11,7 @@
         "generic_s3.jpg"
     ],
     "mcu": "esp32s3",
-    "product": "M5Stack Cardputer ADV Custom",
+    "product": "M5Stack Cardputer-ADV",
     "thumbnail": "",
     "url": "https://docs.m5stack.com/en/core/Cardputer",
     "vendor": "M5Stack"

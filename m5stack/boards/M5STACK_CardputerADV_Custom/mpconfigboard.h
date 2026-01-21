@@ -1,12 +1,13 @@
 /*
 * SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+* SPDX-FileContributor: Hao Liu (TheRealHaoLiu)
 *
 * SPDX-License-Identifier: MIT
 *
 * CardputerADV Custom - Cloud-free board configuration
 */
 
-#define MICROPY_HW_BOARD_NAME               "M5STACK Cardputer Custom"
+#define MICROPY_HW_BOARD_NAME               "M5STACK Cardputer-ADV"
 #define MICROPY_HW_MCU_NAME                 "ESP32-S3-FN8"
 
 #define MICROPY_PY_MACHINE_DAC              (0)
@@ -17,7 +18,7 @@
 #define MICROPY_HW_I2C0_SCL                 (9)
 #define MICROPY_HW_I2C0_SDA                 (8)
 
-#define MICROPY_HW_USB_CDC_INTERFACE_STRING  "M5Stack Cardputer-ADV-Custom"
+#define MICROPY_HW_USB_CDC_INTERFACE_STRING  "M5Stack Cardputer-ADV-Custom(TheRealHaoLiu)"
 
 // If not enable LVGL, ignore this...
 #include "./../mpconfiglvgl.h"
